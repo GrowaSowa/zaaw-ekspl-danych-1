@@ -1,0 +1,80 @@
+---
+title: "Raport"
+author: "151774"
+output: html_document
+---
+```{r, echo=FALSE}
+format(Sys.Date(), "%B %d, %Y")
+```
+
+### Spis treści
+
+
+### Podsumowanie
+
+
+### Biblioteki
+```{r}
+library(dplyr)
+library(ggplot2)
+library(ggcorrplot)
+```
+
+### Wczytywanie danych
+```{r}
+data <- read.csv("data.csv")
+```
+
+### Podsumowanie zbioru surowego
+```{r}
+nrow(data)
+```
+```{r}
+summary(data)
+```
+
+### Przetwarzanie wartości brakujących
+
+Zasady czyszczenia danych:
+
+* Rekordy z 8+ wartościami N/A są pomijane,
+* Kolumny z 50+% wartościami N/A są pomijane,
+* Reszta wartości N/A jest podmienianych medianą.
+```{r}
+keep_rows <- rowSums(is.na(data)) < 8
+keep_cols <- colSums(is.na(data)) < nrow(data) / 2
+medians <- sapply(data[, sapply(data, is.numeric)], median, na.rm = TRUE)
+median_cols <- intersect(colnames(data)[keep_cols], names(medians))
+
+data <- filter(data, keep_rows)
+data <- select(data, colnames(data)[keep_cols])
+for (col in median_cols) {
+  data[is.na(data[, col]), col] <- medians[col]
+}
+```
+
+### Podsumowanie zbioru po czyszczeniu
+```{r}
+nrow(data)
+```
+```{r}
+summary(data)
+```
+
+### Szczegółowa analiza wartości atrybutów
+```{r}
+for (col in colnames(data)) {
+  if (is.numeric(data[, col])) {
+    hist(data[, col], main = col,
+         xlab = "Wartość", ylab = "Wystąpienia")
+  }
+}
+```
+
+### Korelacja
+```{r}
+ggcorrplot(cor(select(data, where(is.numeric))))
+```
+<!-- interaktywne wykresy -->
+
+<!-- predykcje z użyciem ML -->
