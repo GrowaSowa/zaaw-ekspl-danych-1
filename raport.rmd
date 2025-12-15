@@ -1,14 +1,13 @@
 ---
 title: "Raport"
 author: "151774"
-output: html_document
+output:
+  html_document:
+    toc: true
 ---
 ```{r, echo=FALSE}
 format(Sys.Date(), "%B %d, %Y")
 ```
-
-### Spis treści
-
 
 ### Podsumowanie
 
