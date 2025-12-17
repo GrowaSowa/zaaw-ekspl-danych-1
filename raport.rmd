@@ -36,17 +36,19 @@ summary(data)
 
 Zasady czyszczenia danych:
 
-* Rekordy z 8+ wartościami N/A są pomijane,
+* Kolumny duplikatowe są pomijane,
 * Kolumny z 50+% wartościami N/A są pomijane,
+* Rekordy z 50+% wartościami N/A (po pominięciu kolumn) są pomijane,
 * Reszta wartości N/A jest podmienianych medianą.
 ```{r}
-keep_rows <- rowSums(is.na(data)) < 8
 keep_cols <- colSums(is.na(data)) < nrow(data) / 2
+keep_cols["Limits.of.Potential.Window..V."] <- FALSE
 medians <- sapply(data[, sapply(data, is.numeric)], median, na.rm = TRUE)
 median_cols <- intersect(colnames(data)[keep_cols], names(medians))
 
-data <- filter(data, keep_rows)
 data <- select(data, colnames(data)[keep_cols])
+keep_rows <- rowSums(is.na(data)) < sum(keep_cols) / 2
+data <- filter(data, keep_rows)
 for (col in median_cols) {
   data[is.na(data[, col]), col] <- medians[col]
 }
