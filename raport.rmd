@@ -17,6 +17,8 @@ format(Sys.Date(), "%B %d, %Y")
 library(dplyr)
 library(ggplot2)
 library(ggcorrplot)
+library(caret)
+library(shapper)
 ```
 
 ### Wczytywanie danych
