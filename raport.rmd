@@ -80,4 +80,44 @@ ggcorrplot(cor(select(data, where(is.numeric))))
 ```
 <!-- interaktywne wykresy -->
 
-<!-- predykcje z użyciem ML -->
+### Predykcja pojemności za pomocą regresji liniowej
+```{r}
+# zmiana kolumn tekstowych na enumy
+elec_conf_vallist <- unique(data$Electrode.Configuration)
+elec_chem_vallist <- unique(data$Electrolyte.Chemical.Formula)
+cell_conf_vallist <- unique(data$Cell.Configuration..three.two.electrode.system.)
+
+ml_data <- data %>%
+  mutate(Electrode.Configuration = match(Electrode.Configuration, elec_conf_vallist)) %>%
+  mutate(Electrolyte.Chemical.Formula = match(Electrolyte.Chemical.Formula, elec_chem_vallist)) %>%
+  mutate(Cell.Configuration..three.two.electrode.system. = match(Cell.Configuration..three.two.electrode.system., cell_conf_vallist)) %>%
+  select(-Ref.)
+
+# podział zbioru danych
+set.seed(9001)
+is_training <- createDataPartition(
+  y = ml_data$Capacitance..F.g.,
+  p = .75,
+  list = FALSE
+)
+
+training_data <- ml_data[is_training, ]
+testing_data <- ml_data[-is_training, ]
+
+# uczenie
+ctrl <- trainControl(
+  method = "cv",
+#   number = 2,
+  repeats = 10
+)
+set.seed(1337)
+fit <- train(
+  Capacitance..F.g. ~ .,
+  data = training_data,
+  method = "lm",
+  trControl = ctrl
+)
+
+# predykcja
+predictions <- predict(fit, newdata = testing_data)
+```
