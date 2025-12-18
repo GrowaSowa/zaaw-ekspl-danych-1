@@ -17,6 +17,7 @@ format(Sys.Date(), "%B %d, %Y")
 library(dplyr)
 library(ggplot2)
 library(ggcorrplot)
+library(plotly)
 library(caret)
 library(shapper)
 ```
@@ -78,7 +79,11 @@ for (col in colnames(data)) {
 ```{r}
 ggcorrplot(cor(select(data, where(is.numeric))))
 ```
-<!-- interaktywne wykresy -->
+
+### Interaktywne wykresy
+```{r}
+
+```
 
 ### Predykcja pojemności za pomocą regresji liniowej
 ```{r}
