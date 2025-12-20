@@ -83,6 +83,7 @@ ggcorrplot(cor(select(data, where(is.numeric))))
 ### Interaktywne wykresy
 ```{r}
 
+# ggplotly(p)
 ```
 
 ### Predykcja pojemności za pomocą regresji liniowej
@@ -124,5 +125,16 @@ fit <- train(
 )
 
 # predykcja
-predictions <- predict(fit, newdata = testing_data)
+predictions <- predict(fit, newdata = select(testing_data, -Capacitance..F.g.))
+
+# shap
+shapped <- shap(fit, data = testing_data, new_observation = testing_data[1, ])
+shapped <- shapped %>%
+  rename(attribution = "_attribution_", vname = "_vname_", sign = "_sign_") %>%
+  filter(vname != "Capacitance..F.g.")
+# plot(shapped)
+ggplot(shapped, aes(x = vname, y = attribution, fill = sign)) +
+  geom_bar(stat = "identity") + coord_flip() +
+  geom_text(aes(label = round(attribution, 2), hjust = "inward")) +
+  guides(fill = FALSE)
 ```
