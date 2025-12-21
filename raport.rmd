@@ -90,8 +90,16 @@ ggcorrplot(cor(select(data, where(is.numeric))))
 
 ### Interaktywne wykresy
 ```{r}
+p <- ggplot(data) +
+  geom_linerange(aes(x = Capacitance..F.g.,
+                     ymin = Lower.Limit.of.Potential.Window..V.,
+                     ymax = Upper.Limit.of.Potential.Window..V.,
+                     color = Cell.Configuration..three.two.electrode.system.),
+                 alpha = 0.15) +
+  labs(y = "Potential.Window..V.", color = "Cell Configuration") +
+  coord_flip()
 
-# ggplotly(p)
+ggplotly(p)
 ```
 
 ### Predykcja pojemności za pomocą regresji liniowej
