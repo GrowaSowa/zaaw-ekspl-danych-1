@@ -42,7 +42,8 @@ Zasady czyszczenia danych:
 * Kolumny duplikatowe są pomijane,
 * Kolumny z 50+% wartościami N/A są pomijane,
 * Rekordy z 50+% wartościami N/A (po pominięciu kolumn) są pomijane,
-* Reszta wartości N/A jest podmienianych medianą.
+* Reszta wartości N/A jest podmienianych medianą,
+* W wypadku danych tekstowych wartości puste są podmienianie najczęściej występującą wartością.
 ```{r}
 keep_cols <- colSums(is.na(data)) < nrow(data) / 2
 keep_cols["Limits.of.Potential.Window..V."] <- FALSE
@@ -54,6 +55,17 @@ keep_rows <- rowSums(is.na(data)) < sum(keep_cols) / 2
 data <- filter(data, keep_rows)
 for (col in median_cols) {
   data[is.na(data[, col]), col] <- medians[col]
+}
+
+string_cols <- colnames(data)[!sapply(data, is.numeric)]
+for (col in string_cols) {
+  # val_cnt <- data %>%
+  #   select(col) %>%
+  #   group_by(col) %>%
+  #   summarize(cnt = count(col))
+  tt <- table(data[, col])
+  max_val <- names(tt[tt == max(tt)])[1]
+  data[data[, col] == "", col] <- max_val
 }
 ```
 
