@@ -59,10 +59,6 @@ for (col in median_cols) {
 
 string_cols <- colnames(data)[!sapply(data, is.numeric)]
 for (col in string_cols) {
-  # val_cnt <- data %>%
-  #   select(col) %>%
-  #   group_by(col) %>%
-  #   summarize(cnt = count(col))
   tt <- table(data[, col])
   max_val <- names(tt[tt == max(tt)])[1]
   data[data[, col] == "", col] <- max_val
