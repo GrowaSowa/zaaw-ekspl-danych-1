@@ -43,7 +43,8 @@ Zasady czyszczenia danych:
 * Kolumny z 50+% wartościami N/A są pomijane,
 * Rekordy z 50+% wartościami N/A (po pominięciu kolumn) są pomijane,
 * Reszta wartości N/A jest podmienianych medianą,
-* W wypadku danych tekstowych wartości puste są podmienianie najczęściej występującą wartością.
+* W wypadku danych tekstowych wartości puste są podmienianie najczęściej występującą wartością,
+* Spacje na początku i końcu wartości tekstowych są usuwane. 
 ```{r}
 keep_cols <- colSums(is.na(data)) < nrow(data) / 2
 keep_cols["Limits.of.Potential.Window..V."] <- FALSE
@@ -57,8 +58,20 @@ for (col in median_cols) {
   data[is.na(data[, col]), col] <- medians[col]
 }
 
+str_strip <- function(x) {
+  x_sub <- x
+  while (substring(x_sub, 1, 1) == " ") {
+    x_sub <- substring(x_sub, 2)
+  }
+  while (substring(x_sub, nchar(x_sub)) == " ") {
+    x_sub <- substring(x_sub, 1, nchar(x_sub) - 1)
+  }
+  return(x_sub)
+}
+
 string_cols <- colnames(data)[!sapply(data, is.numeric)]
 for (col in string_cols) {
+  data[, col] <- sapply(data[, col], str_strip)
   tt <- table(data[, col])
   max_val <- names(tt[tt == max(tt)])[1]
   data[data[, col] == "", col] <- max_val
@@ -79,13 +92,30 @@ for (col in colnames(data)) {
   if (is.numeric(data[, col])) {
     hist(data[, col], main = col,
          xlab = "Wartość", ylab = "Wystąpienia")
+  } else if (!(col %in% c("Ref.", "Electrode.Configuration"))) {
+    tt <- table(data[, col])
+    val_cnt <- data.frame(vals = names(tt),
+                          counts = as.numeric(tt))
+    print(ggplot(val_cnt, aes(x = vals, y = counts)) +
+      geom_bar(stat = "identity") +
+      labs(x = "Wartość", y = "Wystąpienia", title = col) +
+      theme(axis.text.x = element_text(angle = 30, vjust = 0.5)))
   }
 }
 ```
 
 ### Korelacja
 ```{r}
-ggcorrplot(cor(select(data, where(is.numeric))))
+elec_conf_vallist <- unique(data$Electrode.Configuration)
+elec_chem_vallist <- unique(data$Electrolyte.Chemical.Formula)
+cell_conf_vallist <- unique(data$Cell.Configuration..three.two.electrode.system.)
+
+data_w_enums <- data %>%
+  mutate(Electrode.Configuration = match(Electrode.Configuration, elec_conf_vallist)) %>%
+  mutate(Electrolyte.Chemical.Formula = match(Electrolyte.Chemical.Formula, elec_chem_vallist)) %>%
+  mutate(Cell.Configuration..three.two.electrode.system. = match(Cell.Configuration..three.two.electrode.system., cell_conf_vallist))
+
+ggcorrplot(cor(select(data_w_enums, where(is.numeric))))
 ```
 
 ### Interaktywne wykresy
@@ -129,8 +159,8 @@ testing_data <- ml_data[-is_training, ]
 # uczenie
 ctrl <- trainControl(
   method = "cv",
-#   number = 2,
-  repeats = 10
+  # number = 2,
+  # repeats = 10
 )
 set.seed(1337)
 fit <- train(
