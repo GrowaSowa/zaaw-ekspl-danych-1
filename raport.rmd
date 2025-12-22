@@ -132,6 +132,22 @@ p <- ggplot(data) +
 ggplotly(p)
 ```
 
+```{r}
+n_list <- names(head(sort(table(data$Electrolyte.Chemical.Formula), decreasing = TRUE), 10))
+data_filtered <- data %>%
+  filter(Electrolyte.Chemical.Formula %in% n_list)
+p <- ggplot(data_filtered) +
+  geom_linerange(aes(x = Capacitance..F.g.,
+                     ymin = Lower.Limit.of.Potential.Window..V.,
+                     ymax = Upper.Limit.of.Potential.Window..V.,
+                     color = Electrolyte.Chemical.Formula),
+                 alpha = 0.2) +
+  labs(y = "Potential.Window..V.", color = "Chemical Formula") +
+  coord_flip()
+
+ggplotly(p)
+```
+
 ### Predykcja pojemności za pomocą regresji liniowej
 ```{r}
 # zmiana kolumn tekstowych na enumy
