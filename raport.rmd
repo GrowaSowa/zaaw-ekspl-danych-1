@@ -135,7 +135,7 @@ ggplotly(p)
 ```
 
 ```{r}
-n_list <- names(head(sort(table(data$Electrolyte.Chemical.Formula), decreasing = TRUE), 10))
+n_list <- names(head(sort(table(data$Electrolyte.Chemical.Formula), decreasing = TRUE), 12))
 data_filtered <- data %>%
   filter(Electrolyte.Chemical.Formula %in% n_list)
 p <- ggplot(data_filtered) +
@@ -149,6 +149,63 @@ p <- ggplot(data_filtered) +
   coord_flip()
 
 ggplotly(p)
+```
+
+```{r}
+p <- ggplot(data_filtered) +
+  geom_point(aes(x = Capacitance..F.g.,
+                 y = Current.Density..A.g.,
+                 color = Electrolyte.Chemical.Formula))
+
+ggplotly(p)
+```
+
+```{r}
+p <- ggplot(data_filtered) +
+  geom_point(aes(x = Capacitance..F.g.,
+                 y = Electrolyte.Ionic.Conductivity,
+                 color = Electrolyte.Chemical.Formula))
+
+ggplotly(p)
+```
+
+```{r}
+p <- ggplot(data_filtered) +
+  geom_point(aes(x = Capacitance..F.g.,
+                 y = Electrolyte.Concentration..M.,
+                 color = Electrolyte.Chemical.Formula))
+
+ggplotly(p)
+```
+
+```{r, echo=FALSE}
+# fld_lst <- list(
+#   list(method = "update",
+#        args = list(list(y = list(data_filtered$Current.Density..A.g.)),
+#                    list(yaxis = list(title = "Current.Density..A.g."))),
+#        label = "Current.Density..A.g."),
+#   list(method = "update",
+#        args = list(list(y = list(data_filtered$Electrolyte.Ionic.Conductivity)),
+#                    list(yaxis = list(title = "Electrolyte.Ionic.Conductivity"))),
+#        label = "Electrolyte.Ionic.Conductivity"),
+#   list(method = "update",
+#        args = list(list(y = list(data_filtered$Electrolyte.Concentration..M.)),
+#                    list(yaxis = list(title = "Electrolyte.Concentration..M."))),
+#        label = "Electrolyte.Concentration..M.")
+# )
+
+# p <- ggplot(data_filtered) +
+#   geom_point(aes(x = Capacitance..F.g.,
+#                  y = Electrolyte.Ionic.Conductivity,
+#                  color = Electrolyte.Chemical.Formula))
+
+# fig <- ggplotly(p)
+
+# fig <- fig %>%
+#   layout(updatemenus = list(list(active = 1, x = -0.05, y = 1.1,
+#                                  xanchor = "center", buttons = fld_lst)))
+
+# fig
 ```
 
 ### Trendy w badaniach
