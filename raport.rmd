@@ -20,6 +20,7 @@ library(ggcorrplot)
 library(plotly)
 library(caret)
 library(shapper)
+library(DALEX)
 ```
 
 ### Wczytywanie danych
@@ -192,13 +193,11 @@ fit <- train(
 predictions <- predict(fit, newdata = select(testing_data, -Capacitance..F.g.))
 
 # shap
-shapped <- shap(fit, data = testing_data, new_observation = testing_data[1, ])
-shapped <- shapped %>%
-  rename(attribution = "_attribution_", vname = "_vname_", sign = "_sign_") %>%
-  filter(vname != "Capacitance..F.g.")
-# plot(shapped)
-ggplot(shapped, aes(x = vname, y = attribution, fill = sign)) +
-  geom_bar(stat = "identity") + coord_flip() +
-  geom_text(aes(label = round(attribution, 2), hjust = "inward")) +
-  guides(fill = FALSE)
+explainer <- explain(fit,
+                     data = training_data %>% select(-Capacitance..F.g.),
+                     y = as.numeric(training_data$Capacitance..F.g.))
+shapped <- shap(explainer,
+                new_observation = testing_data[1, ] %>%
+                  select(-Capacitance..F.g.))
+plot(shapped)
 ```
