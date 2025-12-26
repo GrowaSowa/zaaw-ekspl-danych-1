@@ -255,7 +255,12 @@ fit <- train(
 
 # predykcja
 predictions <- predict(fit, newdata = select(testing_data, -Capacitance..F.g.))
+mse <- mean((testing_data$Capacitance..F.g. - predictions)^2)
+```
 
+Błąd średniokwadratowy modelu wynosi `r format(mse, scientific = FALSE)`.
+
+```{r}
 # shap
 explainer <- explain(fit,
                      data = training_data %>% select(-Capacitance..F.g.),
