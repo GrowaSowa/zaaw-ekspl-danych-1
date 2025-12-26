@@ -10,7 +10,9 @@ format(Sys.Date(), "%B %d, %Y")
 ```
 
 ## Podsumowanie
+Badania są w większości skoncentrowane na elektrodach z elektrolitem wykonanym z wodorotlenku potasu (KOH) lub kwasu siarkowego (H~2~SO~4~). Najczęściej występujące materiały posiadają w badaniach lepsze rezultaty, choć znaczna większość przeprowadzonych badań raportuje względnie niską pojemność badanych elektrod (< 500 F/g).
 
+Co wyróżnia te badania, w których odnotowano znacznie wyższą pojemność nie jest jasne, gdyż zbiór danych ma poważne braki - u około połowy atrybutów zbioru ponad połowę wartości zajmują wartości puste. U atrybutów z lepszym pokryciem choć jasne jest jakie są przedziały wartości dla lepszych rezultatów pojemności (np. okno stabilności około 0-0.5 V), istnieją w zbiorze także dane z podobnymi parametrami, ale znacznie gorszym wynikiem pojemności.
 
 ## Biblioteki
 ```{r}
@@ -104,6 +106,8 @@ for (col in colnames(data)) {
   }
 }
 ```
+
+W zestwieniu pominięto atrybut konfiguracji elektrody, gdyż jest to atrybut tekstowy z aż `r length(unique(data$Electrode.Configuration))` różnymi wartościami. Nie jest możliwe zaprezentowanie rozkładu wartości tego atrybutu w raporcie w czytelny sposób.
 
 ## Korelacja
 ```{r}
@@ -209,6 +213,7 @@ ggplotly(p)
 ```
 
 ### Trendy w badaniach
+Najlepszą pojemność osiągają materiały których okno stabilności mieści się około granic 0-0.5 V. Konfiguracja trójelektrodowa okazuje znacznie lepszą pojemność niż dwuelektrodowa kosztem węższego okna stabilności. Najwyższe pojemności ze zbioru osiągają materiały z eletrolitem wykonanym z wodorotlenku potasu (KOH). Gęstość natężenia jest w większości danych niska (< 10 A/g), choć z jej wzrostem spada maksymalna zanotowana wartość pojemności.
 
 ## Predykcja pojemności za pomocą regresji liniowej
 ```{r}
